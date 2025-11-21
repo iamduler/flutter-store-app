@@ -1,9 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:store_app/controllers/auth.dart';
 import 'package:store_app/views/screens/authentication/register.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final AuthController _authController = AuthController();
+
+  late String email;
+  late String password;
+
+  bool _isLoading = false;
+
+  login() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await _authController
+        .signIn(context: context, email: email, password: password)
+        .whenComplete(() {
+          setState(() {
+            _isLoading = false;
+          });
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +88,9 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   TextFormField(
+                    onChanged: (value) {
+                      email = value;
+                    },
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Email is required';
@@ -104,6 +134,9 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   TextFormField(
+                    onChanged: (value) {
+                      password = value;
+                    },
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Password is required';
@@ -128,7 +161,10 @@ class LoginScreen extends StatelessWidget {
                       ),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: Image.asset('assets/icons/password.png', width: 16),
+                        child: Image.asset(
+                          'assets/icons/password.png',
+                          width: 16,
+                        ),
                       ),
                       suffixIcon: Icon(Icons.visibility),
                     ),
@@ -137,9 +173,7 @@ class LoginScreen extends StatelessWidget {
                   InkWell(
                     onTap: () {
                       if (_formKey.currentState!.validate()) {
-                        print('Form is valid');
-                      } else {
-                        print('Form is invalid');
+                        login();
                       }
                     },
                     child: Container(
@@ -225,16 +259,20 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ),
                           Center(
-                            child: Text(
-                              'Sign in',
-                              style: GoogleFonts.getFont(
-                                'Nunito Sans',
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
+                            child: _isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : Text(
+                                    'Sign in',
+                                    style: GoogleFonts.getFont(
+                                      'Nunito Sans',
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1.5,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -254,12 +292,20 @@ class LoginScreen extends StatelessWidget {
                       ),
                       InkWell(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegisterScreen(),
+                            ),
+                          );
                         },
-                        child: Text('Sign up', style: GoogleFonts.roboto(
-                          color: Color(0xFFF96161),
-                          fontWeight: FontWeight.bold,
-                        ),),
+                        child: Text(
+                          'Sign up',
+                          style: GoogleFonts.roboto(
+                            color: Color(0xFFF96161),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),

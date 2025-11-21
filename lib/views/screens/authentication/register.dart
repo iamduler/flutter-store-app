@@ -1,9 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:store_app/controllers/auth.dart';
 import 'package:store_app/views/screens/authentication/login.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final AuthController _authController = AuthController();
+
+  late String fullName;
+  late String email;
+  late String password;
+
+  bool _isLoading = false;
+
+  register() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await _authController
+        .signUp(
+          context: context,
+          fullName: fullName,
+          email: email,
+          password: password,
+        )
+        .whenComplete(() {
+          setState(() {
+            _isLoading = false;
+          });
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +94,9 @@ class RegisterScreen extends StatelessWidget {
                     ),
                   ),
                   TextFormField(
+                    onChanged: (value) {
+                      fullName = value;
+                    },
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Full name is required';
@@ -104,6 +140,9 @@ class RegisterScreen extends StatelessWidget {
                     ),
                   ),
                   TextFormField(
+                    onChanged: (value) {
+                      email = value;
+                    },
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Email is required';
@@ -147,6 +186,9 @@ class RegisterScreen extends StatelessWidget {
                     ),
                   ),
                   TextFormField(
+                    onChanged: (value) {
+                      password = value;
+                    },
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Password is required';
@@ -171,7 +213,10 @@ class RegisterScreen extends StatelessWidget {
                       ),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: Image.asset('assets/icons/password.png', width: 16),
+                        child: Image.asset(
+                          'assets/icons/password.png',
+                          width: 16,
+                        ),
                       ),
                       suffixIcon: Icon(Icons.visibility),
                     ),
@@ -180,9 +225,7 @@ class RegisterScreen extends StatelessWidget {
                   InkWell(
                     onTap: () {
                       if (_formKey.currentState!.validate()) {
-                        print('Form is valid');
-                      } else {
-                        print('Form is invalid');
+                        register();
                       }
                     },
                     child: Container(
@@ -268,7 +311,7 @@ class RegisterScreen extends StatelessWidget {
                             ),
                           ),
                           Center(
-                            child: Text(
+                            child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : Text(
                               'Sign up',
                               style: GoogleFonts.getFont(
                                 'Nunito Sans',
@@ -297,7 +340,12 @@ class RegisterScreen extends StatelessWidget {
                       ),
                       InkWell(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginScreen(),
+                            ),
+                          );
                         },
                         child: Text(
                           'Sign in',
