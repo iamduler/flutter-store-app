@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/views/screens/navigation/widgets/header.dart';
+import 'package:store_app/views/screens/navigation/widgets/banner.dart';
+import 'package:store_app/views/screens/navigation/widgets/category_item.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -11,6 +13,8 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             HeaderWidget(),
+            BannerWidget(),
+            CategoryItemWidget(),
           ],
         ),
       ),
