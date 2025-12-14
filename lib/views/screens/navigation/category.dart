@@ -5,9 +5,12 @@ import 'package:store_app/views/screens/navigation/widgets/header.dart';
 import 'package:store_app/controllers/category.dart';
 import 'package:store_app/models/category.dart';
 import 'package:store_app/controllers/subcategory.dart';
+import 'package:store_app/views/screens/detail/screens/widgets/subcategory_tile.dart';
 
 class CategoryScreen extends StatefulWidget {
-  const CategoryScreen({super.key});
+  final bool includeHeader;
+  const CategoryScreen({super.key, bool? includeHeader}) 
+      : includeHeader = includeHeader ?? true;
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -52,10 +55,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 20),
-        child: HeaderWidget(),
+        preferredSize: widget.includeHeader
+            ? Size.fromHeight(MediaQuery.of(context).size.height * 0.12)
+            : Size.fromHeight(0),
+        child: widget.includeHeader ? const HeaderWidget() : const SizedBox.shrink(),
       ),
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Left side display categories
           Expanded(
@@ -107,82 +113,66 @@ class _CategoryScreenState extends State<CategoryScreen> {
             child: Container(
               color: Colors.white,
               child: _selectedCategory != null
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            _selectedCategory!.name,
-                            style: GoogleFonts.quicksand(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.7,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            height: 150,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(_selectedCategory!.banner),
-                                fit: BoxFit.cover,
+                  ? SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              _selectedCategory!.name,
+                              style: GoogleFonts.quicksand(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.7,
                               ),
                             ),
                           ),
-                        ),
-                        _subcategories!.isNotEmpty
-                            ? GridView.builder(
-                                shrinkWrap: true,
-                                itemCount: _subcategories!.length,
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3,
-                                      mainAxisSpacing: 4,
-                                      crossAxisSpacing: 8,
-                                    ),
-                                itemBuilder: (context, index) {
-                                  final subcategory = _subcategories![index];
-                                  return Column(
-                                    children: [
-                                      Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade200,
-                                        ),
-                                        child: Center(
-                                          child: Image.network(
-                                            subcategory.image,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                      Center(
-                                        child: Text(
-                                          subcategory.subCategoryName,
-                                          style: GoogleFonts.quicksand(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              )
-                            : Center(
-                                child: Text(
-                                  'No subcategories found',
-                                  style: GoogleFonts.quicksand(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height: 150,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                    _selectedCategory!.banner,
                                   ),
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                      ],
+                            ),
+                          ),
+                          _subcategories!.isNotEmpty
+                              ? GridView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: _subcategories!.length,
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3,
+                                        mainAxisSpacing: 4,
+                                        crossAxisSpacing: 8,
+                                        childAspectRatio: 2 / 3,
+                                      ),
+                                  itemBuilder: (context, index) {
+                                    final subcategory = _subcategories![index];
+                                    return SubcategoryTileWidget(
+                                      image: subcategory.image,
+                                      title: subcategory.subCategoryName,
+                                    );
+                                  },
+                                )
+                              : Center(
+                                  child: Text(
+                                    'No subcategories found',
+                                    style: GoogleFonts.quicksand(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                        ],
+                      ),
                     )
                   : Center(child: Text('Select a category')),
             ),

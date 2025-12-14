@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/controllers/category.dart';
 import 'package:store_app/models/category.dart';
 import 'package:store_app/views/screens/navigation/widgets/reusable_text.dart';
+import 'package:store_app/views/screens/detail/screens/inner_category_screen.dart';
 
 class CategoryItemWidget extends StatefulWidget {
   const CategoryItemWidget({super.key});
@@ -49,22 +50,27 @@ class _CategoryItemWidgetState extends State<CategoryItemWidget> {
                 ),
                 itemBuilder: (context, index) {
                   final category = categories[index];
-                  return Column(
-                    children: [
-                      Expanded(
-                        child: Image.network(category.image, fit: BoxFit.cover),
-                      ),
-                      Text(
-                        category.name,
-                        style: GoogleFonts.quicksand(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => InnerCategoryScreen(category: category)));
+                    },
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Image.network(category.image, fit: BoxFit.cover),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                        Text(
+                          category.name,
+                          style: GoogleFonts.quicksand(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   );
                 },
               );

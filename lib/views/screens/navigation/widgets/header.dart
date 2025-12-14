@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 class HeaderWidget extends StatelessWidget {
-  const HeaderWidget({super.key});
+  final bool includeBackButton;
+  const HeaderWidget({super.key, this.includeBackButton = false});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.2,
+      height: MediaQuery.of(context).size.height * 0.14,
       child: Stack(
         // Stack is used to overlay the image with the text
         children: [
@@ -16,6 +17,17 @@ class HeaderWidget extends StatelessWidget {
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
           ),
+          if (includeBackButton)
+            Positioned(
+              left: 0,
+              top: 68,
+              child: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.arrow_back, color: Colors.white, size: 24),
+              ),
+            ),
           Positioned(
             left: 48,
             top: 68,
