@@ -1,38 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:store_app/views/screens/authentication/login.dart';
 import 'package:store_app/views/screens/main.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:store_app/provider/user_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+
+  // Run the flutter application wrapped in a ProviderScope for managing the state of the application
+  runApp(ProviderScope(child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+// Root the widget of the application, a consumerWidget to consume the state change
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  // Method to check the token and set the user data if available
+  Future<void> _checkTokenAndSetUser(WidgetRef ref) async {
+    // Obtain an instance of the shared preferences for local data storage
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Get the token from the shared preferences
+    String? token = prefs.getString('auth_token');
+    String? userJson = prefs.getString('user');
+
+    // If both the token and user data are not empty, set the user data
+    if (token != null && userJson != null) {
+      ref.read(userProvider.notifier).setUser(userJson);
+    }
+  }
+  
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Store App',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: MainScreen(),
+      home: FutureBuilder(future: _checkTokenAndSetUser(ref), builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final user = ref.watch(userProvider);
+        return user != null ? MainScreen() : LoginScreen();
+      }),
     );
   }
 }
