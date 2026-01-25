@@ -28,6 +28,10 @@ class MyApp extends ConsumerWidget {
     if (token != null && userJson != null) {
       ref.read(userProvider.notifier).setUser(userJson);
     }
+    else {
+      // If either the token or user data is empty, sign out the user
+      ref.read(userProvider.notifier).signOut();
+    }
   }
   
   @override

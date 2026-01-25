@@ -24,6 +24,11 @@ class UserProvider extends StateNotifier<User?> {
   void setUser(String userJson) {
     state = User.fromJson(userJson);
   }
+  
+  // Method to clear the user data
+  void signOut() {
+    state = null;
+  }
 }
 
 // Make the data accessible within the application

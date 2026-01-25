@@ -100,4 +100,30 @@ class AuthController {
       },
     );
   }
+
+  Future<void> signOut({ required context }) async {
+    try {
+      // Access shared preferences to clear the user token
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      // Clear the authentication token and user data from shared preferences
+      await prefs.remove('auth_token');
+      await prefs.remove('user');
+
+      // Clear the user data from the application state using Riverpod
+      providerContainer.read(userProvider.notifier).signOut();
+
+      // Navigate the user to the login screen
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+        (route) => false, // Navigate to login screen
+      );
+      showSnackBar(context, 'Logout successful');
+    }
+    catch (e) {
+      showSnackBar(context, 'Error signing out: $e');
+      print('Error signing out: $e');
+    }
+  }
 }
