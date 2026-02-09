@@ -76,13 +76,16 @@ class AuthController {
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
         // Get the token from the response body
-        String token = jsonDecode(response.body)['token'];
+        final Map<String, dynamic> decodedBody =
+            jsonDecode(response.body) as Map<String, dynamic>;
+        final String token = decodedBody['token'] as String;
         
         // Store the authentication token securely in shared preferences
         await prefs.setString('auth_token', token);
 
-        // Encode the user data to JSON
-        final userJson = jsonEncode(jsonDecode(response.body)['user']);
+        // Use the entire response body as the user JSON,
+        // because the API returns the user fields at the top level
+        final String userJson = response.body;
 
         // Update the application state with the user data using Riverpod
         providerContainer.read(userProvider.notifier).setUser(userJson);
