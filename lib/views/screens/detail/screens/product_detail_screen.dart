@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/models/product.dart';
+import 'package:store_app/provider/cart_provider.dart';
+import 'package:store_app/services/manage_http_response.dart';
 
-class ProductDetailScreen extends StatefulWidget {
+class ProductDetailScreen extends ConsumerStatefulWidget {
   final Product product;
   const ProductDetailScreen({super.key, required this.product});
 
   @override
-  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  // ignore: library_private_types_in_public_api
+  _ProductDetailScreenState createState() => _ProductDetailScreenState();
 }
 
-class _ProductDetailScreenState extends State<ProductDetailScreen> {
+class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
+    final _cartProvider = ref.read(cartProvider.notifier);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -151,7 +157,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       bottomSheet: Padding(
         padding: EdgeInsets.all(8.0),
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            _cartProvider.addToCart(
+              productName: widget.product.name,
+              productPrice: widget.product.price,
+              category: widget.product.category,
+              images: widget.product.images.map((image) => image.toString()).toList(),
+              vendorId: widget.product.vendorId,
+              vendorName: widget.product.vendorName,
+              productQuantity: widget.product.quantity,
+              quantity: 1,
+              productId: widget.product.id,
+              description: widget.product.description ?? '',
+            );
+
+            // Show a success message
+            showSnackBar(context, 'Product added to cart');
+          },
           child: Container(
             width: 386,
             height: 46,

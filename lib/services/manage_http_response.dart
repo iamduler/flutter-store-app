@@ -27,6 +27,12 @@ void manageHttpResponse({required http.Response response, required BuildContext 
 void showSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
+      margin: const EdgeInsets.all(15),
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.grey[800],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
       content: Text(message),
     ),
   );
