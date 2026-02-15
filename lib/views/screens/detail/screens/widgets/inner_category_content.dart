@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:store_app/controllers/product.dart';
 import 'package:store_app/models/category.dart';
 import 'package:store_app/views/screens/detail/screens/widgets/inner_banner.dart';
+import 'package:store_app/views/screens/navigation/widgets/product_item.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/models/subcategory.dart';
 import 'package:store_app/controllers/subcategory.dart';
 import 'package:store_app/views/screens/detail/screens/widgets/subcategory_tile.dart';
+import 'package:store_app/views/screens/navigation/widgets/reusable_text.dart';
+import 'package:store_app/models/product.dart';
 
 class InnerCategoryContentWidget extends StatefulWidget {
   final CategoryModel category;
@@ -12,11 +16,15 @@ class InnerCategoryContentWidget extends StatefulWidget {
   final int subcategoriesPerRow = 7;
 
   @override
-  State<InnerCategoryContentWidget> createState() => _InnerCategoryContentWidgetState();
+  State<InnerCategoryContentWidget> createState() =>
+      _InnerCategoryContentWidgetState();
 }
 
-class _InnerCategoryContentWidgetState extends State<InnerCategoryContentWidget> {
+class _InnerCategoryContentWidgetState
+    extends State<InnerCategoryContentWidget> {
   late Future<List<SubcategoryModel>> _futureSubcategories;
+  late Future<List<Product>> _futureProducts;
+
   final SubcategoryController _subcategoryController = SubcategoryController();
 
   @override
@@ -24,6 +32,10 @@ class _InnerCategoryContentWidgetState extends State<InnerCategoryContentWidget>
     super.initState();
     _futureSubcategories = _subcategoryController
         .getSubcategoriesByCategoryName(widget.category.name);
+
+    _futureProducts = ProductController().loadProductsByCategory(
+      widget.category.name,
+    );
   }
 
   @override
@@ -59,29 +71,68 @@ class _InnerCategoryContentWidgetState extends State<InnerCategoryContentWidget>
                   return SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: List.generate((subcategories.length / widget.subcategoriesPerRow).ceil(), (
-                        index,
-                      ) {
-                        // For each row, calculate the start and end index of the subcategories
-                        final startIndex = index * widget.subcategoriesPerRow;
-                        final endIndex = (index + 1) * widget.subcategoriesPerRow;
-        
-                        // Create a padding widget to add space between the rows
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: subcategories
-                                .sublist(startIndex, endIndex > subcategories.length ? subcategories.length : endIndex)
-                                .map(
-                                  (subcategory) => SubcategoryTileWidget(
-                                    image: subcategory.image,
-                                    title: subcategory.subCategoryName,
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        );
-                      }),
+                      children: List.generate(
+                        (subcategories.length / widget.subcategoriesPerRow)
+                            .ceil(),
+                        (index) {
+                          // For each row, calculate the start and end index of the subcategories
+                          final startIndex = index * widget.subcategoriesPerRow;
+                          final endIndex =
+                              (index + 1) * widget.subcategoriesPerRow;
+
+                          // Create a padding widget to add space between the rows
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: subcategories
+                                  .sublist(
+                                    startIndex,
+                                    endIndex > subcategories.length
+                                        ? subcategories.length
+                                        : endIndex,
+                                  )
+                                  .map(
+                                    (subcategory) => SubcategoryTileWidget(
+                                      image: subcategory.image,
+                                      title: subcategory.subCategoryName,
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+            const ReusableTextWidget(
+              title: 'Popular Products',
+              subtitle: 'View all',
+            ),
+            FutureBuilder(
+              future: _futureProducts,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No products found'));
+                } else {
+                  final products = snapshot.data!;
+
+                  return SizedBox(
+                    height: 250,
+                    child: ListView.builder(
+                      itemCount: products.length,
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final product = products[index];
+                        return ProductItemWidget(product: product);
+                      },
                     ),
                   );
                 }
