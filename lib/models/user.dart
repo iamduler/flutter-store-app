@@ -4,7 +4,9 @@ class User {
   final String id;
   final String fullName;
   final String email;
-  final String address;
+  final String state;
+  final String city;
+  final String locality;
   final String gender;
   final String password;
   final String token;
@@ -13,7 +15,9 @@ class User {
     required this.id,
     required this.fullName,
     required this.email,
-    required this.address,
+    required this.state,
+    required this.city,
+    required this.locality,
     required this.gender,
     required this.password,
     required this.token,
@@ -25,7 +29,9 @@ class User {
       'id': id,
       'fullName': fullName,
       'email': email,
-      'address': address,
+      'state': state,
+      'city': city,
+      'locality': locality,
       'gender': gender,
       'password': password,
       'token': token,
@@ -41,7 +47,9 @@ class User {
       id: map['_id'] as String,
       fullName: map['fullName'] as String? ?? "",
       email: map['email'] as String? ?? "",
-      address: map['address'] as String? ?? "",
+      state: map['state'] as String? ?? "",
+      city: map['city'] as String? ?? "",
+      locality: map['locality'] as String? ?? "",
       gender: map['gender'] as String? ?? "",
       password: map['password'] as String? ?? "",
       token: map['token'] as String? ?? "",

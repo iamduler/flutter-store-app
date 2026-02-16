@@ -22,6 +22,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Widget build(BuildContext context) {
     final cartData = ref.read(cartProvider);
     final _cartProvider = ref.read(cartProvider.notifier);
+    final user = ref.watch(userProvider);
     final OrderController orderController = OrderController();
 
     return Scaffold(
@@ -82,35 +83,33 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                         alignment: Alignment.centerLeft,
                                         child: SizedBox(
                                           width: 114,
-                                          child: Text(
-                                            'Add address',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              height: 1.1,
-                                            ),
-                                          ),
+                                          child: user!.state.isEmpty
+                                              ? Text(
+                                                  'Add address',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    height: 1.1,
+                                                  ),
+                                                )
+                                              : Text(
+                                                  'Address',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    height: 1.1,
+                                                  ),
+                                                ),
                                         ),
                                       ),
                                       SizedBox(height: 4),
                                       Align(
                                         alignment: Alignment.centerLeft,
                                         child: Text(
-                                          'Vietnam',
+                                          '${user.state}, ${user.city}, ${user.locality}',
                                           style: GoogleFonts.lato(
                                             fontSize: 14,
                                             fontWeight: FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'Enter city',
-                                          style: GoogleFonts.lato(
-                                            color: Color(0xFF7F808c),
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12,
                                           ),
                                         ),
                                       ),
@@ -338,7 +337,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-        child: ref.read(userProvider)!.address.isEmpty
+        child: user.state.isEmpty
             ? TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -364,18 +363,20 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       entry,
                     ) {
                       var item = entry.value;
+                      var address =
+                          '${user.state}, ${user.city}, ${user.locality}';
                       orderController.uploadOrder(
                         id: '',
-                        fullName: ref.read(userProvider)!.fullName,
-                        email: ref.read(userProvider)!.email,
-                        address: ref.read(userProvider)!.address,
+                        fullName: user.fullName,
+                        email: user.email,
+                        address: address,
                         phone: '',
                         productName: item.productName,
                         price: item.productPrice,
                         quantity: item.productQuantity,
                         category: item.category,
                         image: resolveProductImageUrl(item.images)!,
-                        buyerId: ref.read(userProvider)!.id,
+                        buyerId: user.id,
                         vendorId: item.vendorId,
                         processing: true,
                         delivered: false,

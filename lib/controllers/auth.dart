@@ -11,8 +11,6 @@ import 'package:store_app/views/screens/authentication/login.dart';
 import 'package:store_app/views/screens/main.dart';
 import 'package:store_app/provider/user_provider.dart';
 
-final providerContainer = ProviderContainer();
-
 class AuthController {
   Future<void> signUp({
     required context,
@@ -25,7 +23,9 @@ class AuthController {
         id: '',
         fullName: fullName,
         email: email,
-        address: '',
+        state: '',
+        city: '',
+        locality: '',
         gender: '',
         password: password,
         token: '',
@@ -45,7 +45,9 @@ class AuthController {
         onSuccess: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => LoginScreen()), // Navigate to login screen
+            MaterialPageRoute(
+              builder: (context) => LoginScreen(),
+            ), // Navigate to login screen
           );
           showSnackBar(context, 'Account created successfully');
         },
@@ -79,7 +81,7 @@ class AuthController {
         final Map<String, dynamic> decodedBody =
             jsonDecode(response.body) as Map<String, dynamic>;
         final String token = decodedBody['token'] as String;
-        
+
         // Store the authentication token securely in shared preferences
         await prefs.setString('auth_token', token);
 
@@ -88,7 +90,8 @@ class AuthController {
         final String userJson = response.body;
 
         // Update the application state with the user data using Riverpod
-        providerContainer.read(userProvider.notifier).setUser(userJson);
+        final container = ProviderScope.containerOf(context, listen: false);
+        container.read(userProvider.notifier).setUser(userJson);
 
         // Store the data in shared preferences for future use
         await prefs.setString('user', userJson);
@@ -104,7 +107,7 @@ class AuthController {
     );
   }
 
-  Future<void> signOut({ required context }) async {
+  Future<void> signOut({required context}) async {
     try {
       // Access shared preferences to clear the user token
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -114,7 +117,8 @@ class AuthController {
       await prefs.remove('user');
 
       // Clear the user data from the application state using Riverpod
-      providerContainer.read(userProvider.notifier).signOut();
+      final container = ProviderScope.containerOf(context, listen: false);
+      container.read(userProvider.notifier).signOut();
 
       // Navigate the user to the login screen
       Navigator.pushAndRemoveUntil(
@@ -123,10 +127,46 @@ class AuthController {
         (route) => false, // Navigate to login screen
       );
       showSnackBar(context, 'Logout successful');
-    }
-    catch (e) {
+    } catch (e) {
       showSnackBar(context, 'Error signing out: $e');
       print('Error signing out: $e');
+    }
+  }
+
+  Future<void> saveAddress({
+    required context,
+    required String id,
+    required String state,
+    required String city,
+    required String locality,
+  }) async {
+    try {
+      final http.Response response = await http.put(
+        Uri.parse('$uri/api/users/$id'),
+        body: json.encode({'state': state, 'city': city, 'locality': locality}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      );
+
+      manageHttpResponse(
+        response: response,
+        context: context,
+        onSuccess: () async {
+          final userJson = jsonDecode(response.body);
+          final userString = jsonEncode(userJson);
+
+          // Update the user data in the application state using Riverpod
+          final container = ProviderScope.containerOf(context, listen: false);
+          container.read(userProvider.notifier).setUser(userString);
+
+          // Store the user data in shared preferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('user', userString);
+        },
+      );
+    } catch (e) {
+      print('Error saving address: $e');
     }
   }
 }
