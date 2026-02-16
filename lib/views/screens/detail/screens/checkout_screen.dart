@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/provider/cart_provider.dart';
+import 'package:store_app/services/manage_http_response.dart';
+import 'package:store_app/controllers/order.dart';
 import 'package:store_app/views/screens/navigation/widgets/product_image.dart';
+import 'package:store_app/provider/user_provider.dart';
+import 'package:store_app/views/screens/detail/screens/shipping_address_screen.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -17,6 +21,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     final cartData = ref.read(cartProvider);
+    final _cartProvider = ref.read(cartProvider.notifier);
+    final OrderController orderController = OrderController();
 
     return Scaffold(
       appBar: AppBar(title: Text('Checkout')),
@@ -27,7 +33,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ShippingAddressScreen(),
+                    ),
+                  );
+                },
                 child: SizedBox(
                   width: 335,
                   height: 74,
@@ -325,24 +338,77 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-        child: Container(
-          width: 338,
-          height: 58,
-          decoration: BoxDecoration(
-            color: const Color(0xFF3854EE),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Center(
-            child: Text(
-              selectedPaymentMethod == 'cash_on_delivery' ? 'Pay with COD' : 'Pay Now',
-              style: GoogleFonts.roboto(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+        child: ref.read(userProvider)!.address.isEmpty
+            ? TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ShippingAddressScreen(),
+                    ),
+                  );
+                },
+                child: Text(
+                  'Please enter your address',
+                  style: GoogleFonts.roboto(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+              )
+            : InkWell(
+                onTap: () async {
+                  if (selectedPaymentMethod == 'cash_on_delivery') {
+                    await Future.forEach(_cartProvider.getCartItems.entries, (
+                      entry,
+                    ) {
+                      var item = entry.value;
+                      orderController.uploadOrder(
+                        id: '',
+                        fullName: ref.read(userProvider)!.fullName,
+                        email: ref.read(userProvider)!.email,
+                        address: ref.read(userProvider)!.address,
+                        phone: '',
+                        productName: item.productName,
+                        price: item.productPrice,
+                        quantity: item.productQuantity,
+                        category: item.category,
+                        image: resolveProductImageUrl(item.images)!,
+                        buyerId: ref.read(userProvider)!.id,
+                        vendorId: item.vendorId,
+                        processing: true,
+                        delivered: false,
+                        context: context,
+                      );
+                    });
+                  } else if (selectedPaymentMethod == 'stripe') {
+                    // Implement Stripe payment
+                  } else {
+                    showSnackBar(context, 'Please select a payment method');
+                  }
+                },
+                child: Container(
+                  width: 338,
+                  height: 58,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF3854EE),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Center(
+                    child: Text(
+                      selectedPaymentMethod == 'cash_on_delivery'
+                          ? 'Pay with COD'
+                          : 'Pay Now',
+                      style: GoogleFonts.roboto(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
       ),
     );
   }

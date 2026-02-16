@@ -97,6 +97,8 @@ class CartNotifier extends StateNotifier<Map<String, Cart>> {
 
     return totalAmount;
   }
+
+  Map<String, Cart> get getCartItems => state;
 }
 
 // Make the data accessible within the application
