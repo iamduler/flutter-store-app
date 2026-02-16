@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/models/product.dart';
 import 'package:store_app/provider/cart_provider.dart';
 import 'package:store_app/services/manage_http_response.dart';
+import 'package:store_app/views/screens/navigation/widgets/product_image.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final Product product;
@@ -73,10 +74,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         height: 300,
                         child: PageView.builder(
                           scrollDirection: Axis.horizontal,
-                          itemCount: widget.product.images.length,
+                          itemCount: widget.product.images.isEmpty
+                              ? 1
+                              : widget.product.images.length,
                           itemBuilder: (context, index) {
-                            return Image.network(
-                              widget.product.images[index],
+                            final imageUrl = resolveProductImageUrlAt(
+                                widget.product.images, index);
+                            return ProductImageWidget(
+                              imageUrl: imageUrl,
                               width: 198,
                               height: 225,
                               fit: BoxFit.cover,

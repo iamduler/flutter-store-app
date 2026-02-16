@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/provider/cart_provider.dart';
+import 'package:store_app/views/screens/navigation/widgets/product_image.dart';
+import 'package:store_app/views/screens/detail/screens/checkout_screen.dart';
 import 'package:store_app/views/screens/main.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
@@ -186,6 +188,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     itemCount: cartData.length,
                     itemBuilder: (context, index) {
                       final cartItem = cartData.values.toList()[index];
+                      final imageUrl = resolveProductImageUrl(cartItem.images);
+
                       return Card(
                         child: SizedBox(
                           height: 200,
@@ -195,8 +199,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                               SizedBox(
                                 height: 100,
                                 width: 100,
-                                child: Image.network(
-                                  cartItem.images[0],
+                                child: ProductImageWidget(
+                                  imageUrl: imageUrl,
+                                  width: 100,
+                                  height: 100,
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -343,7 +349,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             Align(
               alignment: const Alignment(0.83, 0),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CheckoutScreen(),
+                    ),
+                  );
+                },
                 child: Container(
                   width: 166,
                   height: 71,
