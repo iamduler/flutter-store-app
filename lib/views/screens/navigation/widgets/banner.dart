@@ -1,57 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:store_app/models/banner.dart';
 import 'package:store_app/controllers/banner.dart';
+import 'package:store_app/provider/banner_provider.dart';
 
-class BannerWidget extends StatefulWidget {
+class BannerWidget extends ConsumerStatefulWidget {
   const BannerWidget({super.key});
 
   @override
-  State<BannerWidget> createState() => _BannerWidgetState();
+  ConsumerState<BannerWidget> createState() => _BannerWidgetState();
 }
 
-class _BannerWidgetState extends State<BannerWidget> {
-  // A Future that will load the banners from the API
-  late Future<List<BannerModel>> futureBanners;
-
+class _BannerWidgetState extends ConsumerState<BannerWidget> {
   @override
   void initState() {
     super.initState();
-    futureBanners = BannerController().loadBanners();
+    _fetchBanners();
   }
 
-  @override
+  Future<void> _fetchBanners() async {
+    try {
+      final banners = await BannerController().loadBanners();
+      ref.read(bannerProvider.notifier).setBanners(banners);
+    } catch (e) {
+      print('Error fetching banners: $e');
+    }
+  }
+
   Widget build(BuildContext context) {
+    final banners = ref.watch(bannerProvider);
+
     return Container(
       width: MediaQuery.of(context).size.width,
       height: 170,
       decoration: BoxDecoration(
-        color: Color(0xFFF7F7F7),
+        color: const Color(0xFFF7F7F7),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: FutureBuilder(
-        future: futureBanners,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            final banners = snapshot.data!;
+      child: PageView.builder(
+        itemCount: banners.length,
+        itemBuilder: (context, index) {
+          final banner = banners[index];
 
-            return PageView.builder(
-              itemCount: banners.length,
-              itemBuilder: (context, index) {
-                final banner = banners[index];
-
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.network(banner.image, fit: BoxFit.cover),
-                );
-              },
-            );
-          } else {
-            return const Center(child: Text('No banners found'));
-          }
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.network(banner.image, fit: BoxFit.cover),
+          );
         },
       ),
     );
