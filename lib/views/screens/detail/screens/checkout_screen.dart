@@ -363,14 +363,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       entry,
                     ) {
                       var item = entry.value;
-                      var address =
-                          '${user.state}, ${user.city}, ${user.locality}';
                       orderController.uploadOrder(
                         id: '',
                         fullName: user.fullName,
                         email: user.email,
-                        address: address,
-                        phone: '',
+                        state: user.state,
+                        city: user.city,
+                        locality: user.locality,
                         productName: item.productName,
                         price: item.productPrice,
                         quantity: item.productQuantity,

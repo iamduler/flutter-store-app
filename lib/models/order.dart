@@ -4,8 +4,9 @@ class Order {
   final String id;
   final String fullName;
   final String email;
-  final String address;
-  final String phone;
+  final String state;
+  final String city;
+  final String locality;
   final String productName;
   final int price;
   final int quantity;
@@ -20,8 +21,9 @@ class Order {
     required this.id,
     required this.fullName,
     required this.email,
-    required this.address,
-    required this.phone,
+    required this.state,
+    required this.city,
+    required this.locality,
     required this.productName,
     required this.price,
     required this.quantity,
@@ -38,8 +40,9 @@ class Order {
       'id': id,
       'fullName': fullName,
       'email': email,
-      'address': address,
-      'phone': phone,
+      'state': state,
+      'city': city,
+      'locality': locality,
       'productName': productName,
       'price': price,
       'quantity': quantity,
@@ -52,27 +55,25 @@ class Order {
     };
   }
 
-  factory Order.fromMap(Map<String, dynamic> map) {
-    return Order(
-      id: map['_id'] as String,
-      fullName: map['fullName'] as String,
-      email: map['email'] as String,
-      address: map['address'] as String,
-      phone: map['phone'] as String,
-      productName: map['productName'] as String,
-      price: map['price'] as int,
-      quantity: map['quantity'] as int,
-      category: map['category'] as String,
-      image: map['image'] as String,
-      buyerId: map['buyerId'] as String,
-      vendorId: map['vendorId'] as String,
-      processing: map['processing'] as bool,
-      delivered: map['delivered'] as bool,
-    );
-  }
-
   String toJson() => json.encode(toMap());
 
-  factory Order.fromJson(String source) =>
-      Order.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Order.fromJson(Map<String, dynamic> json) {
+    return Order(
+      id: json['_id'] as String,
+      fullName: json['fullName'] as String,
+      email: json['email'] as String,
+      state: json['state'] as String,
+      city: json['city'] as String,
+      locality: json['locality'] as String,
+      productName: json['productName'] as String,
+      price: json['price'] as int,
+      quantity: json['quantity'] as int,
+      category: json['category'] as String,
+      image: json['image'] as String,
+      buyerId: json['buyerId'] as String,
+      vendorId: json['vendorId'] as String,
+      processing: json['processing'] as bool,
+      delivered: json['delivered'] as bool,
+    );
+  }
 }

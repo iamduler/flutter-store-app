@@ -19,7 +19,7 @@ String? resolveProductImageUrlAt(List<dynamic>? images, int index) {
   if (images == null || index < 0 || index >= images.length) return null;
   if (images[index] is! String) return null;
   final candidate = images[index] as String;
-  return candidate.isEmpty ? null : candidate;
+  return candidate.isEmpty ? _kDefaultPlaceholderUrl : candidate;
 }
 
 /// Widget that loads a product image from [imageUrl].
