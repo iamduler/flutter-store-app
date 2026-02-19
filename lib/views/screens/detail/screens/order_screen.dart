@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/provider/user_provider.dart';
 import 'package:store_app/controllers/order.dart';
 import 'package:store_app/provider/order_provider.dart';
+import 'package:store_app/services/manage_http_response.dart';
 import 'package:store_app/views/screens/detail/screens/order_detail_screen.dart';
 import 'package:store_app/views/screens/navigation/widgets/product_image.dart';
 
@@ -32,6 +33,15 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
       } catch (e) {
         print('Error fetching orders: ${e}');
       }
+    }
+  }
+
+  Future<void> _deleteOrder(String orderId) async {
+    try {
+      await OrderController().deleteOrder(orderId: orderId, context: context);
+      _fetchOrders(); // Refresh the orders list
+    } catch (e) {
+      print('Error deleting order: ${e}');
     }
   }
 
@@ -303,7 +313,7 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
                                       left: 298,
                                       child: InkWell(
                                         onTap: () {
-                                          // OrderController().deleteOrder(order.id);
+                                          _deleteOrder(order.id);
                                         },
                                         child: Image.asset(
                                           'assets/icons/delete.png',
