@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/provider/user_provider.dart';
 import 'package:store_app/controllers/order.dart';
 import 'package:store_app/provider/order_provider.dart';
+import 'package:store_app/views/screens/detail/screens/order_detail_screen.dart';
 import 'package:store_app/views/screens/navigation/widgets/product_image.dart';
 
 class OrderScreen extends ConsumerStatefulWidget {
@@ -116,190 +117,209 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
                     horizontal: 25,
                     vertical: 25,
                   ),
-                  child: Container(
-                    width: 335,
-                    height: 153,
-                    clipBehavior: Clip.antiAlias,
-                    decoration: const BoxDecoration(),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            child: Container(
-                              width: 336,
-                              height: 154,
-                              clipBehavior: Clip.antiAlias,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: const Color(0xFFEFF0F2),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderDetailScreen(order: order),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 335,
+                      height: 153,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: const BoxDecoration(),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Positioned(
+                              left: 0,
+                              top: 0,
+                              child: Container(
+                                width: 336,
+                                height: 154,
+                                clipBehavior: Clip.antiAlias,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: const Color(0xFFEFF0F2),
+                                  ),
+                                  borderRadius: BorderRadius.circular(9),
                                 ),
-                                borderRadius: BorderRadius.circular(9),
-                              ),
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Positioned(
-                                    left: 13,
-                                    top: 9,
-                                    child: Container(
-                                      width: 78,
-                                      height: 78,
-                                      clipBehavior: Clip.antiAlias,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFBCC5FF),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          Positioned(
-                                            left: 10,
-                                            top: 5,
-                                            child: Image.network(
-                                              imageUrl!,
-                                              width: 58,
-                                              height: 67,
-                                              fit: BoxFit.cover,
-                                            ),
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Positioned(
+                                      left: 13,
+                                      top: 9,
+                                      child: Container(
+                                        width: 78,
+                                        height: 78,
+                                        clipBehavior: Clip.antiAlias,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFBCC5FF),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
                                           ),
-                                        ],
+                                        ),
+                                        child: Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            Positioned(
+                                              left: 10,
+                                              top: 5,
+                                              child: Image.network(
+                                                imageUrl!,
+                                                width: 58,
+                                                height: 67,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Positioned(
-                                    left: 101,
-                                    top: 14,
-                                    child: SizedBox(
-                                      width: 216,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: SizedBox(
-                                              width: double.infinity,
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  SizedBox(
-                                                    width: double.infinity,
-                                                    child: Text(
-                                                      order.productName,
-                                                      style: GoogleFonts.roboto(
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: double.infinity,
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.centerLeft,
+                                    Positioned(
+                                      left: 101,
+                                      top: 14,
+                                      child: SizedBox(
+                                        width: 216,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: SizedBox(
+                                                width: double.infinity,
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    SizedBox(
+                                                      width: double.infinity,
                                                       child: Text(
-                                                        order.category,
+                                                        order.productName,
                                                         style:
                                                             GoogleFonts.roboto(
-                                                              fontSize: 12,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              color:
-                                                                  const Color(
-                                                                    0xFF8F9091,
-                                                                  ),
+                                                              fontSize: 16,
                                                             ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  const SizedBox(height: 2),
-                                                  Align(
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    child: Text(
-                                                      '\$${order.price.toStringAsFixed(2)}',
-                                                      style: GoogleFonts.roboto(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Colors.pink,
+                                                    SizedBox(
+                                                      width: double.infinity,
+                                                      child: Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Text(
+                                                          order.category,
+                                                          style:
+                                                              GoogleFonts.roboto(
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                color:
+                                                                    const Color(
+                                                                      0xFF8F9091,
+                                                                    ),
+                                                              ),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
+                                                    const SizedBox(height: 2),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: Text(
+                                                        '\$${order.price.toStringAsFixed(2)}',
+                                                        style:
+                                                            GoogleFonts.roboto(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color:
+                                                                  Colors.pink,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Positioned(
-                                    left: 13,
-                                    top: 113,
-                                    child: Container(
-                                      width: 80,
-                                      height: 22,
-                                      clipBehavior: Clip.antiAlias,
-                                      decoration: BoxDecoration(
-                                        color: order.delivered == true
-                                            ? Colors.green
-                                            : order.processing == true
-                                            ? Colors.purple
-                                            : Colors.red,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          Positioned(
-                                            left: 9,
-                                            top: 2,
-                                            child: Text(
-                                              order.delivered == true
-                                                  ? 'Delivered'
-                                                  : order.processing == true
-                                                  ? 'Processing'
-                                                  : 'Cancelled',
-                                              style: GoogleFonts.roboto(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.white,
+                                    Positioned(
+                                      left: 13,
+                                      top: 113,
+                                      child: Container(
+                                        width: 80,
+                                        height: 22,
+                                        clipBehavior: Clip.antiAlias,
+                                        decoration: BoxDecoration(
+                                          color: order.delivered == true
+                                              ? Colors.green
+                                              : order.processing == true
+                                              ? Colors.purple
+                                              : Colors.red,
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                        child: Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            Positioned(
+                                              left: 9,
+                                              top: 2,
+                                              child: Text(
+                                                order.delivered == true
+                                                    ? 'Delivered'
+                                                    : order.processing == true
+                                                    ? 'Processing'
+                                                    : 'Cancelled',
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.white,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Positioned(
-                                    top: 115,
-                                    left: 298,
-                                    child: InkWell(
-                                      onTap: () {
-                                        // OrderController().deleteOrder(order.id);
-                                      },
-                                      child: Image.asset(
-                                        'assets/icons/delete.png',
-                                        width: 16,
-                                        height: 16,
-                                        fit: BoxFit.contain,
-                                        color: Colors.red,
+                                    Positioned(
+                                      top: 115,
+                                      left: 298,
+                                      child: InkWell(
+                                        onTap: () {
+                                          // OrderController().deleteOrder(order.id);
+                                        },
+                                        child: Image.asset(
+                                          'assets/icons/delete.png',
+                                          width: 16,
+                                          height: 16,
+                                          fit: BoxFit.contain,
+                                          color: Colors.red,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
