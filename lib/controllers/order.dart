@@ -4,6 +4,7 @@ import 'package:store_app/global_variable.dart';
 import 'package:store_app/models/order.dart';
 import 'package:store_app/services/manage_http_response.dart';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OrderController {
   uploadOrder({
@@ -25,6 +26,9 @@ class OrderController {
     required BuildContext context,
   }) async {
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
+
       final Order order = Order(
         id: id,
         fullName: fullName,
@@ -48,6 +52,7 @@ class OrderController {
         body: order.toJson(),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token!,
         },
       );
 
@@ -65,11 +70,15 @@ class OrderController {
   }
 
   Future<List<Order>> loadOrders({required String buyerId}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+
     try {
       http.Response response = await http.get(
         Uri.parse('$uri/api/orders/$buyerId'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token!,
         },
       );
 
@@ -79,7 +88,7 @@ class OrderController {
             .map((order) => Order.fromJson(order))
             .toList();
         return orders;
-      } else {        
+      } else {
         throw Exception('Failed to load orders');
       }
     } catch (e) {
@@ -88,10 +97,15 @@ class OrderController {
   }
 
   Future<void> deleteOrder({required String orderId, required context}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
     try {
       http.Response response = await http.delete(
         Uri.parse('$uri/api/orders/$orderId'),
-        headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8'},
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token!,
+        },
       );
 
       manageHttpResponse(
@@ -101,7 +115,6 @@ class OrderController {
           showSnackBar(context, 'Order deleted successfully');
         },
       );
-
     } catch (e) {
       showSnackBar(context, 'Error deleting order: $e');
     }
