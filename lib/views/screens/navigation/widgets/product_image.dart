@@ -16,8 +16,8 @@ String? resolveProductImageUrl(List<dynamic>? images) {
 /// Resolves the image URL at [index] from [images].
 /// Returns null if index is out of range or element is not a non-empty string.
 String? resolveProductImageUrlAt(List<dynamic>? images, int index) {
-  if (images == null || index < 0 || index >= images.length) return null;
-  if (images[index] is! String) return null;
+  if (images == null || index < 0 || index >= images.length) return _kDefaultPlaceholderUrl;
+  if (images[index] is! String) return _kDefaultPlaceholderUrl;
   final candidate = images[index] as String;
   return candidate.isEmpty ? _kDefaultPlaceholderUrl : candidate;
 }

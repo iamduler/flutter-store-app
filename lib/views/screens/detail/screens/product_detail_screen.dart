@@ -50,7 +50,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   productName: widget.product.name,
                   productPrice: widget.product.price,
                   category: widget.product.category,
-                  images: widget.product.images,
+                  image: resolveProductImageUrlAt(widget.product.images, 0)!,
                   vendorId: widget.product.vendorId,
                   vendorName: widget.product.vendorName,
                   productId: widget.product.id,

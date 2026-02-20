@@ -86,7 +86,7 @@ class _ProductItemWidgetState extends ConsumerState<ProductItemWidget> {
                             productName: widget.product.name,
                             productPrice: widget.product.price,
                             category: widget.product.category,
-                            images: widget.product.images,
+                            image: imageUrl ?? '123',
                             vendorId: widget.product.vendorId,
                             vendorName: widget.product.vendorName,
                             productId: widget.product.id,
@@ -105,7 +105,7 @@ class _ProductItemWidgetState extends ConsumerState<ProductItemWidget> {
                     child: InkWell(
                       onTap: () {
                         if (isInCart) {
-                          print('Product is in cart');
+                          showSnackBar(context, 'Product is already in cart');
                         } else {
                                 cartProviderData.addToCart(
                                   productName: widget.product.name,
