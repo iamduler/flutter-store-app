@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/models/product.dart';
 import 'package:store_app/provider/cart_provider.dart';
+import 'package:store_app/provider/favorite_provider.dart';
 import 'package:store_app/services/manage_http_response.dart';
 import 'package:store_app/views/screens/navigation/widgets/product_image.dart';
 
@@ -19,8 +20,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final cartProviderData = ref.read(cartProvider.notifier);
+    final favoriteProviderData = ref.read(favoriteProvider.notifier);
     final cardNotifier = ref.watch(cartProvider);
     final isInCart = cardNotifier.containsKey(widget.product.id);
+    final isInFavorite = favoriteProviderData.getFavorites.containsKey(
+      widget.product.id,
+    );
+
+    ref.watch(favoriteProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -33,7 +40,29 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           ),
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.favorite_border)),
+          IconButton(
+            onPressed: () {
+              if (isInFavorite) {
+                favoriteProviderData.removeFromFavorites(widget.product.id);
+                showSnackBar(context, 'Product removed from favorites');
+              } else {
+                favoriteProviderData.addToFavorites(
+                  productName: widget.product.name,
+                  productPrice: widget.product.price,
+                  category: widget.product.category,
+                  images: widget.product.images,
+                  vendorId: widget.product.vendorId,
+                  vendorName: widget.product.vendorName,
+                  productId: widget.product.id,
+                );
+
+                showSnackBar(context, 'Product added to favorites');
+              }
+            },
+            icon: isInFavorite
+                ? Icon(Icons.favorite, color: Colors.red)
+                : Icon(Icons.favorite_border),
+          ),
         ],
       ),
       body: Column(

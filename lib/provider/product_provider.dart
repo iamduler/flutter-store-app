@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:store_app/models/product.dart';
 
-class ProductProvider extends StateNotifier<List<Product>> {
-  ProductProvider() : super([]);
+class ProductNotifier extends StateNotifier<List<Product>> {
+  ProductNotifier() : super([]);
 
   void setProducts(List<Product> products) {
     state = products;
   }
 }
 
-final productProvider = StateNotifierProvider<ProductProvider, List<Product>>((ref) {
-  return ProductProvider();
+final productProvider = StateNotifierProvider<ProductNotifier, List<Product>>((ref) {
+  return ProductNotifier();
 });

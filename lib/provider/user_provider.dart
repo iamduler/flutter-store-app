@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:store_app/models/user.dart';
 
-class UserProvider extends StateNotifier<User?> {
+class UserNotifier extends StateNotifier<User?> {
   // Constructor initializes with default User object
   // Purpose: Manage the state of the user object allowing updates
-  UserProvider()
+  UserNotifier()
     : super(
         User(
           id: '',
@@ -39,6 +39,6 @@ class UserProvider extends StateNotifier<User?> {
 }
 
 // Make the data accessible within the application
-final userProvider = StateNotifierProvider<UserProvider, User?>((ref) {
-  return UserProvider();
+final userProvider = StateNotifierProvider<UserNotifier, User?>((ref) {
+  return UserNotifier();
 });
