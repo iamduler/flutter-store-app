@@ -4,6 +4,7 @@ import 'package:store_app/views/screens/navigation/widgets/banner.dart';
 import 'package:store_app/views/screens/navigation/widgets/category_item.dart';
 import 'package:store_app/views/screens/navigation/widgets/reusable_text.dart';
 import 'package:store_app/views/screens/navigation/widgets/popular_product.dart';
+import 'package:store_app/views/screens/navigation/widgets/top_rated_product.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,8 +18,10 @@ class HomeScreen extends StatelessWidget {
             HeaderWidget(),
             BannerWidget(),
             CategoryItemWidget(),
-            ReusableTextWidget(title: 'Popular Products', subtitle: 'View all'),
+            ReusableTextWidget(title: 'Popular Products', subtitle: ''),
             PopularProductWidget(),
+            ReusableTextWidget(title: 'Top Rated Products', subtitle: ''),
+            TopRatedProductWidget(),
           ],
         ),
       ),
