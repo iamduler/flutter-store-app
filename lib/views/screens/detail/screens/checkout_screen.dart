@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/provider/cart_provider.dart';
 import 'package:store_app/services/manage_http_response.dart';
 import 'package:store_app/controllers/order.dart';
+import 'package:store_app/views/screens/main.dart';
 import 'package:store_app/views/screens/navigation/widgets/product_image.dart';
 import 'package:store_app/provider/user_provider.dart';
 import 'package:store_app/views/screens/detail/screens/shipping_address_screen.dart';
@@ -380,6 +381,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         processing: true,
                         delivered: false,
                         context: context,
+                      );
+                    }).then((value) {
+                      _cartProvider.clearCart();
+                      showSnackBar(context, 'Order placed successfully');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MainScreen(),
+                        ),
                       );
                     });
                   } else if (selectedPaymentMethod == 'stripe') {

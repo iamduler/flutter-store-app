@@ -149,6 +149,12 @@ class CartNotifier extends StateNotifier<Map<String, Cart>> {
     return totalAmount;
   }
 
+  // Clear the cart
+  void clearCart() async {
+    state = {};
+    await _saveCartsToSharedPreferences();
+  }
+
   Map<String, Cart> get getCartItems => state;
 }
 
