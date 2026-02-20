@@ -15,14 +15,25 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _pageIndex = 0;
-  final List<Widget> _pages = [
-    HomeScreen(),
-    FavoriteScreen(),
-    CategoryScreen(),
-    StoreScreen(),
-    CartScreen(),
-    AccountScreen(),
-  ];
+
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 0:
+        return HomeScreen();
+      case 1:
+        return FavoriteScreen();
+      case 2:
+        return CategoryScreen();
+      case 3:
+        return StoreScreen();
+      case 4:
+        return CartScreen();
+      case 5:
+        return AccountScreen();
+      default:
+        return HomeScreen();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +75,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: _pages[_pageIndex],
+      body: _buildPage(_pageIndex),
     );
   }
 }

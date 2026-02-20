@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/provider/favorite_provider.dart';
-import 'package:store_app/views/screens/navigation/widgets/product_image.dart';
 
 class FavoriteScreen extends ConsumerStatefulWidget {
   const FavoriteScreen({super.key});
@@ -99,7 +98,7 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
               itemCount: favoriteData.length,
               itemBuilder: (context, index) {
                 final favoriteItem = favoriteData.values.toList()[index];
-                final imageUrl = resolveProductImageUrl(favoriteItem.images);
+                final imageUrl = favoriteItem.image;
 
                 return Padding(
                   padding: EdgeInsets.all(8),
