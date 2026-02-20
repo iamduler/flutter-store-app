@@ -13,6 +13,8 @@ class Product {
   final bool? recommend;
   final String? description;
   final List<dynamic> images;
+  final double averageRating;
+  final int totalRatings;
 
   Product({
     required this.id,
@@ -27,6 +29,8 @@ class Product {
     this.popular = false,
     this.recommend = false,
     this.description = '',
+    required this.averageRating,
+    required this.totalRatings,
   });
 
   Map<String, dynamic> toMap() {
@@ -43,6 +47,8 @@ class Product {
       'popular': popular,
       'recommend': recommend,
       'description': description,
+      'averageRating': averageRating,
+      'totalRatings': totalRatings,
     };
   }
 
@@ -62,6 +68,8 @@ class Product {
       popular: json['popular'] as bool,
       recommend: json['recommend'] as bool,
       description: json['description'] as String,
+      averageRating: json['averageRating'] is int ? (json['averageRating'] as int).toDouble() : (json['averageRating'] as double),
+      totalRatings: json['totalRatings'] as int,
     );
   }
 }

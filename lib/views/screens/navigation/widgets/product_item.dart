@@ -60,7 +60,6 @@ class ProductItemWidget extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 8),
             Text(
               product.name,
               maxLines: 2,
@@ -71,7 +70,24 @@ class ProductItemWidget extends StatelessWidget {
                 color: const Color(0xFF212121),
               ),
             ),
-            SizedBox(height: 8),
+            product.averageRating == 0 ? SizedBox() : Row(
+              children: [
+                Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                  size: 16,
+                ),
+                SizedBox(width: 4),
+                Text(
+                  '${product.averageRating.toStringAsFixed(1)} (${product.totalRatings})',
+                  style: GoogleFonts.roboto(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF212121),
+                  ),
+                ),
+              ],
+            ),
             Text(
               product.category,
               style: GoogleFonts.quicksand(

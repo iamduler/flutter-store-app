@@ -81,7 +81,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                               : widget.product.images.length,
                           itemBuilder: (context, index) {
                             final imageUrl = resolveProductImageUrlAt(
-                                widget.product.images, index);
+                              widget.product.images,
+                              index,
+                            );
                             return ProductImageWidget(
                               imageUrl: imageUrl,
                               width: 198,
@@ -136,6 +138,33 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           ),
 
           Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: widget.product.averageRating == 0
+                ? Text(
+                    'No reviews yet',
+                    style: GoogleFonts.roboto(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey,
+                    ),
+                  )
+                : Row(
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        '${widget.product.averageRating.toStringAsFixed(1)} (${widget.product.totalRatings})',
+                        style: GoogleFonts.roboto(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF212121),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+
+          Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,23 +193,27 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       bottomSheet: Padding(
         padding: EdgeInsets.all(8.0),
         child: InkWell(
-          onTap: isInCart ? null : () {
-            cartProviderData.addToCart(
-              productName: widget.product.name,
-              productPrice: widget.product.price,
-              category: widget.product.category,
-              images: widget.product.images.map((image) => image.toString()).toList(),
-              vendorId: widget.product.vendorId,
-              vendorName: widget.product.vendorName,
-              productQuantity: widget.product.quantity,
-              quantity: 1,
-              productId: widget.product.id,
-              description: widget.product.description ?? '',
-            );
+          onTap: isInCart
+              ? null
+              : () {
+                  cartProviderData.addToCart(
+                    productName: widget.product.name,
+                    productPrice: widget.product.price,
+                    category: widget.product.category,
+                    images: widget.product.images
+                        .map((image) => image.toString())
+                        .toList(),
+                    vendorId: widget.product.vendorId,
+                    vendorName: widget.product.vendorName,
+                    productQuantity: widget.product.quantity,
+                    quantity: 1,
+                    productId: widget.product.id,
+                    description: widget.product.description ?? '',
+                  );
 
-            // Show a success message
-            showSnackBar(context, 'Product added to cart');
-          },
+                  // Show a success message
+                  showSnackBar(context, 'Product added to cart');
+                },
           child: Container(
             width: 386,
             height: 46,
