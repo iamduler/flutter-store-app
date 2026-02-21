@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/models/subcategory.dart';
+import 'package:store_app/views/screens/detail/screens/subcategory_product_screen.dart';
 import 'package:store_app/views/screens/navigation/widgets/header.dart';
 import 'package:store_app/controllers/category.dart';
 import 'package:store_app/models/category.dart';
@@ -163,9 +164,19 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                                       ),
                                   itemBuilder: (context, index) {
                                     final subcategory = subcategories[index];
-                                    return SubcategoryTileWidget(
-                                      image: subcategory.image,
-                                      title: subcategory.subCategoryName,
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => SubcategoryProductScreen(subcategory: subcategory),
+                                          ),
+                                        );
+                                      },
+                                      child: SubcategoryTileWidget(
+                                        image: subcategory.image,
+                                        title: subcategory.subCategoryName,
+                                      ),
                                     );
                                   },
                                 )

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/controllers/product.dart';
 import 'package:store_app/models/category.dart';
+import 'package:store_app/views/screens/detail/screens/subcategory_product_screen.dart';
 import 'package:store_app/views/screens/detail/screens/widgets/inner_banner.dart';
 import 'package:store_app/views/screens/navigation/widgets/product_item.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -92,9 +93,19 @@ class _InnerCategoryContentWidgetState
                                         : endIndex,
                                   )
                                   .map(
-                                    (subcategory) => SubcategoryTileWidget(
-                                      image: subcategory.image,
-                                      title: subcategory.subCategoryName,
+                                    (subcategory) => GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => SubcategoryProductScreen(subcategory: subcategory),
+                                          ),
+                                        );
+                                      },
+                                      child: SubcategoryTileWidget(
+                                        image: subcategory.image,
+                                        title: subcategory.subCategoryName,
+                                      ),
                                     ),
                                   )
                                   .toList(),
