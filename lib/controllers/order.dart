@@ -88,6 +88,8 @@ class OrderController {
             .map((order) => Order.fromJson(order))
             .toList();
         return orders;
+      } else if (response.statusCode == 404) {
+        return [];
       } else {
         throw Exception('Failed to load orders');
       }

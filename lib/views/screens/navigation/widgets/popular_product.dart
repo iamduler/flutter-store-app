@@ -8,14 +8,29 @@ class PopularProductWidget extends ConsumerStatefulWidget {
   const PopularProductWidget({super.key});
 
   @override
-  ConsumerState<PopularProductWidget> createState() => _PopularProductWidgetState();
+  ConsumerState<PopularProductWidget> createState() =>
+      _PopularProductWidgetState();
 }
 
 class _PopularProductWidgetState extends ConsumerState<PopularProductWidget> {
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    _fetchProducts();
+
+    // Read the products from the provider
+    final products = ref.read(productProvider);
+
+    // If the products are empty, fetch them
+    if (products.isEmpty) {
+      _fetchProducts();
+    }
+    else {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _fetchProducts() async {
@@ -24,6 +39,10 @@ class _PopularProductWidgetState extends ConsumerState<PopularProductWidget> {
       ref.read(productProvider.notifier).setProducts(products);
     } catch (e) {
       print('Error fetching products: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -31,17 +50,19 @@ class _PopularProductWidgetState extends ConsumerState<PopularProductWidget> {
   Widget build(BuildContext context) {
     final products = ref.watch(productProvider);
 
-    return SizedBox(
-      height: 250,
-      child: ListView.builder(
-        itemCount: products.length,
-        scrollDirection: Axis.horizontal,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return ProductItemWidget(product: product);
-        },
-      ),
-    );
+    return isLoading
+        ? Center(child: CircularProgressIndicator(color: Colors.blueAccent))
+        : SizedBox(
+            height: 250,
+            child: ListView.builder(
+              itemCount: products.length,
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final product = products[index];
+                return ProductItemWidget(product: product);
+              },
+            ),
+          );
   }
 }

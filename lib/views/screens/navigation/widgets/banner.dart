@@ -44,7 +44,10 @@ class _BannerWidgetState extends ConsumerState<BannerWidget> {
 
           return Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.network(banner.image, fit: BoxFit.cover),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(banner.image, fit: BoxFit.cover),
+            ),
           );
         },
       ),

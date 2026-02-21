@@ -23,6 +23,9 @@ class BannerController {
             .toList();
         return banners;
       }
+      else if (response.statusCode == 404) {
+        return [];
+      }
 
       // If the response is not 200, return an empty list
       throw Exception('Failed to load banners');

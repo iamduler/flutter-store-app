@@ -18,6 +18,10 @@ class ProductController {
         final List<Product> products = data.map((product) => Product.fromJson(product)).toList();
         return products;
       }
+      else if (response.statusCode == 404) {
+        return [];
+      }
+      
       throw Exception('Failed to load popular products');
     } catch (e) {
       throw Exception('Error loading popular products: $e');
@@ -36,6 +40,10 @@ class ProductController {
         final List<Product> products = data.map((product) => Product.fromJson(product)).toList();
         return products;
       }
+      else if (response.statusCode == 404) {
+        return [];
+      }
+
       throw Exception('Failed to load products by category');
     } catch (e) {
       throw Exception('Error loading products by category: $e');
@@ -55,6 +63,10 @@ class ProductController {
         final List<Product> products = data.map((product) => Product.fromJson(product)).toList();
         return products;
       }
+      else if (response.statusCode == 404) {
+        return [];
+      }
+
       throw Exception('Failed to load related products by subcategory');
     } catch (e) {
       throw Exception('Error loading related products by subcategory: $e');
@@ -74,6 +86,10 @@ class ProductController {
         final List<Product> products = data.map((product) => Product.fromJson(product)).toList();
         return products;
       }
+      else if (response.statusCode == 404) {
+        return [];
+      }
+
       throw Exception('Failed to load top 10 products by rating');
     } catch (e) {
       throw Exception('Error loading top 10 products by rating: $e');

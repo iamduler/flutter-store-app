@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:store_app/views/screens/authentication/login.dart';
 import 'package:store_app/views/screens/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,6 +37,9 @@ class MyApp extends ConsumerWidget {
   
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Set the system UI overlay style to transparent status bar
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Store App',

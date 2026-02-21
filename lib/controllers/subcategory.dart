@@ -21,19 +21,12 @@ class SubcategoryController {
           return subcategories;
         }
 
-        print('No subcategories found');
-        return [];
-      }
-      else if (response.statusCode == 404) {
-        print('Subcategories not found');
         return [];
       }
       else {
-        print('Failed to load subcategories');
         return [];
       }
     } catch (e) {
-      print('Error loading subcategories: $e');
       return [];
     }
   }

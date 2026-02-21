@@ -8,14 +8,29 @@ class TopRatedProductWidget extends ConsumerStatefulWidget {
   const TopRatedProductWidget({super.key});
 
   @override
-  ConsumerState<TopRatedProductWidget> createState() => _TopRatedProductWidgetState();
+  ConsumerState<TopRatedProductWidget> createState() =>
+      _TopRatedProductWidgetState();
 }
 
 class _TopRatedProductWidgetState extends ConsumerState<TopRatedProductWidget> {
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    _fetchProducts();
+    
+    // Read the products from the provider
+    final products = ref.read(topRatedProductProvider);
+
+    // If the products are empty, fetch them
+    if (products.isEmpty) {
+      _fetchProducts();
+    }
+    else {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _fetchProducts() async {
@@ -24,6 +39,10 @@ class _TopRatedProductWidgetState extends ConsumerState<TopRatedProductWidget> {
       ref.read(topRatedProductProvider.notifier).setProducts(products);
     } catch (e) {
       print('Error fetching top 10 products by rating: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -31,17 +50,19 @@ class _TopRatedProductWidgetState extends ConsumerState<TopRatedProductWidget> {
   Widget build(BuildContext context) {
     final products = ref.watch(topRatedProductProvider);
 
-    return SizedBox(
-      height: 250,
-      child: ListView.builder(
-        itemCount: products.length,
-        scrollDirection: Axis.horizontal,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return ProductItemWidget(product: product);
-        },
-      ),
-    );
+    return isLoading
+        ? Center(child: CircularProgressIndicator(color: Colors.blueAccent))
+        : SizedBox(
+            height: 250,
+            child: ListView.builder(
+              itemCount: products.length,
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final product = products[index];
+                return ProductItemWidget(product: product);
+              },
+            ),
+          );
   }
 }

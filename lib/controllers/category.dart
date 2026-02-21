@@ -18,6 +18,10 @@ class CategoryController {
         final List<CategoryModel> categories = data.map((category) => CategoryModel.fromJson(category)).toList();
         return categories;
       }
+      else if (response.statusCode == 404) {
+        return [];
+      }
+
       throw Exception('Failed to load categories');
     } catch (e) {
       throw Exception('Error loading categories: $e');
