@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -22,8 +24,42 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   bool isLoading = false;
   final OrderController orderController = OrderController();
 
+  static const String _stripePublishableKey =
+      'pk_test_51T3Cq7PIlItWQ5kb01BkcWYqQTcd9PYlOr3iTWG9XM6nX72QdWSJEoSSnTHSncCc15WhAVoNpGbtm5j1a3mMDVMG007PuGM2JA';
+
+  static const Duration _stripeInitTimeout = Duration(seconds: 10);
+
+  /// Khởi tạo Stripe instance khi cần (tránh gọi ở main → MissingPluginException trên Android).
+  /// Timeout 10s, quá thời gian thì báo lỗi.
+  Future<bool> _ensureStripeInitialized() async {
+    try {
+      Stripe.publishableKey = _stripePublishableKey;
+      await Stripe.instance.applySettings().timeout(
+        _stripeInitTimeout,
+        onTimeout: () => throw TimeoutException('Stripe init', _stripeInitTimeout),
+      );
+      return true;
+    } on TimeoutException {
+      if (mounted) {
+        showSnackBar(context, 'Khởi tạo thanh toán quá 10 giây. Vui lòng thử lại.');
+      }
+      return false;
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          'Hệ thống thanh toán chưa sẵn sàng. Thử gỡ cài đặt app rồi cài lại, hoặc dùng thiết bị khác.',
+        );
+      }
+      return false;
+    }
+  }
+
   Future<void> handleStripePayment() async {
     if (isLoading) return;
+
+    // Khởi tạo Stripe trước khi dùng (chỉ chạy lần đầu khi user thanh toán).
+    if (!await _ensureStripeInitialized()) return;
 
     // Fetch cart data from the provider
     final cartData = ref.read(cartProvider);

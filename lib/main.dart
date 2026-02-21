@@ -10,11 +10,9 @@ import 'package:store_app/provider/user_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set the publishable key for the Stripe instance
-  Stripe.publishableKey = 'pk_test_51T3Cq7PIlItWQ5kb01BkcWYqQTcd9PYlOr3iTWG9XM6nX72QdWSJEoSSnTHSncCc15WhAVoNpGbtm5j1a3mMDVMG007PuGM2JA';
-  await Stripe.instance.applySettings();
+  // Không gọi Stripe ở đây: plugin native chưa sẵn sàng lúc startup trên Android
+  // → gây MissingPluginException. Khởi tạo Stripe khi user thanh toán (màn checkout).
 
-  // Run the flutter application wrapped in a ProviderScope for managing the state of the application
   runApp(ProviderScope(child: const MyApp()));
 }
 
