@@ -60,6 +60,7 @@ class _SubcategoryProductScreenState
 
     // Set aspect ratio (height / width) based on the number of columns
     final aspectRatio = numColumns == 4 ? 4 / 5 : 2 / 3;
+    
     return Scaffold(
       appBar: AppBar(title: Text(widget.subcategory.subCategoryName)),
       body: isLoading

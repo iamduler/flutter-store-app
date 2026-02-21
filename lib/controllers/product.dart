@@ -96,7 +96,7 @@ class ProductController {
     }
   }
 
-    // Get related products by subcategory
+  // Get related products by subcategory
   Future<List<Product>> loadProductsBySubcategory(String subcategoryId) async {
     try {
       http.Response response = await http.get(
@@ -116,6 +116,29 @@ class ProductController {
       throw Exception('Failed to load products by sub-category');
     } catch (e) {
       throw Exception('Error loading products by sub-category: $e');
+    }
+  }
+
+  // Get products by keyword
+  Future<List<Product>> searchProducts(String keyword) async {
+    try {
+      http.Response response = await http.get(
+        Uri.parse('$uri/api/products/search?keyword=$keyword'),
+        headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        final List<Product> products = data.map((product) => Product.fromJson(product)).toList();
+        return products;
+      }
+      else if (response.statusCode == 404) {
+        return [];
+      }
+
+      throw Exception('Failed to search products');
+    } catch (e) {
+      throw Exception('Error searching products: $e');
     }
   }
 }

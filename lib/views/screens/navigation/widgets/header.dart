@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:store_app/views/screens/detail/screens/search_product_screen.dart';
 
 class HeaderWidget extends StatelessWidget {
   final bool includeBackButton;
@@ -35,6 +36,14 @@ class HeaderWidget extends StatelessWidget {
               width: 250,
               height: 50,
               child: TextField(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchProductScreen(),
+                    ),
+                  );
+                },
                 decoration: InputDecoration(
                   hintText: 'Enter text to search',
                   hintStyle: const TextStyle(
