@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:store_app/controllers/auth.dart';
 import 'package:store_app/provider/cart_provider.dart';
 import 'package:store_app/provider/favorite_provider.dart';
 import 'package:store_app/provider/user_provider.dart';
@@ -16,12 +17,66 @@ class AccountScreen extends ConsumerStatefulWidget {
 }
 
 class _AccountScreenState extends ConsumerState<AccountScreen> {
+  final AuthController _authController = AuthController();
+
+  void showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'Logout',
+            style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Are you sure you want to logout?',
+            style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await _authController.signOut(context: context, ref: ref);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Logout',
+                style: GoogleFonts.roboto(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
 
     final user = ref.read(userProvider);
-    ref.read(deliveredOrderCountProvider.notifier).fetchDeliveredOrderCount(user!.id, context);
+    ref
+        .read(deliveredOrderCountProvider.notifier)
+        .fetchDeliveredOrderCount(user!.id, context);
   }
 
   @override
@@ -90,7 +145,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                     child: user!.fullName != ""
                         ? Text(
                             user.fullName,
-                            style: GoogleFonts.montserrat(
+                            style: GoogleFonts.roboto(
                               color: Colors.white,
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -98,7 +153,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                           )
                         : Text(
                             'User',
-                            style: GoogleFonts.montserrat(
+                            style: GoogleFonts.roboto(
                               color: Colors.white,
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -121,14 +176,14 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                       child: user.state != ""
                           ? Text(
                               user.state,
-                              style: GoogleFonts.montserrat(
+                              style: GoogleFonts.roboto(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
                               ),
                             )
                           : Text(
                               'States',
-                              style: GoogleFonts.montserrat(
+                              style: GoogleFonts.roboto(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -203,7 +258,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                             top: 66,
                             child: Text(
                               favoriteCount.length.toString(),
-                              style: GoogleFonts.montserrat(
+                              style: GoogleFonts.roboto(
                                 color: Colors.white,
                                 fontSize: 22,
                                 letterSpacing: 0.4,
@@ -215,7 +270,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                             top: 99,
                             child: Text(
                               'Favorite',
-                              style: GoogleFonts.montserrat(
+                              style: GoogleFonts.roboto(
                                 color: Colors.white,
                                 letterSpacing: 0.3,
                               ),
@@ -257,7 +312,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                             top: 66,
                             child: Text(
                               cartData.length.toString(),
-                              style: GoogleFonts.montserrat(
+                              style: GoogleFonts.roboto(
                                 color: Colors.white,
                                 fontSize: 22,
                                 letterSpacing: 0.4,
@@ -269,7 +324,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                             top: 99,
                             child: Text(
                               'Cart',
-                              style: GoogleFonts.montserrat(
+                              style: GoogleFonts.roboto(
                                 fontSize: 14,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -329,7 +384,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               leading: Image.asset('assets/icons/orders.png'),
               title: Text(
                 'Track your order',
-                style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+                style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 10),
@@ -347,7 +402,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               leading: Image.asset('assets/icons/history.png'),
               title: Text(
                 'History',
-                style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+                style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 10),
@@ -356,16 +411,18 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               leading: Image.asset('assets/icons/help.png'),
               title: Text(
                 'Help',
-                style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+                style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 10),
             ListTile(
-              onTap: () {},
+              onTap: () {
+                showLogoutDialog(context);
+              },
               leading: Image.asset('assets/icons/logout.png'),
               title: Text(
                 'Logout',
-                style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+                style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
               ),
             ),
           ],
