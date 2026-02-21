@@ -23,6 +23,9 @@ class OrderController {
     required String vendorId,
     required bool processing,
     required bool delivered,
+    required String paymentIntentId,
+    required String paymentStatus,
+    required String paymentMethod,
     required BuildContext context,
   }) async {
     try {
@@ -45,6 +48,9 @@ class OrderController {
         vendorId: vendorId,
         processing: processing,
         delivered: delivered,
+        paymentIntentId: paymentIntentId,
+        paymentStatus: paymentStatus,
+        paymentMethod: paymentMethod,
       );
 
       final http.Response response = await http.post(
@@ -158,6 +164,33 @@ class OrderController {
       }
     } catch (e) {
       throw Exception('Error creating payment intent: $e');
+    }
+  }
+
+  // Retrieve a payment intent
+  Future<Map<String, dynamic>> getPaymentIntent({
+    required BuildContext context,
+    required String paymentIntentId,
+  }) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
+
+      final response = await http.get(
+        Uri.parse('$uri/api/orders/payment/$paymentIntentId'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token!,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to get payment intent: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error getting payment intent: $e');
     }
   }
 }

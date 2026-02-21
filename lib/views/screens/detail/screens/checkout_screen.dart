@@ -36,12 +36,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       Stripe.publishableKey = _stripePublishableKey;
       await Stripe.instance.applySettings().timeout(
         _stripeInitTimeout,
-        onTimeout: () => throw TimeoutException('Stripe init', _stripeInitTimeout),
+        onTimeout: () =>
+            throw TimeoutException('Stripe init', _stripeInitTimeout),
       );
       return true;
     } on TimeoutException {
       if (mounted) {
-        showSnackBar(context, 'Khởi tạo thanh toán quá 10 giây. Vui lòng thử lại.');
+        showSnackBar(
+          context,
+          'Khởi tạo thanh toán quá 10 giây. Vui lòng thử lại.',
+        );
       }
       return false;
     } catch (e) {
@@ -87,7 +91,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       // Calculate the total amount of the cart
       final totalAmount = cartData.values.fold(
         0.0,
-        (sum, item) => sum + (item.productPrice * item.productQuantity),
+        (sum, item) => sum + (item.productPrice * item.quantity),
       );
 
       if (totalAmount <= 0 || totalAmount.isNaN) {
@@ -112,26 +116,41 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       // Present the payment sheet
       await Stripe.instance.presentPaymentSheet();
 
-      // Upload each cart item as an order
-      for (var item in cartData.values) {
-        await orderController.uploadOrder(
-          id: '',
-          fullName: user.fullName,
-          email: user.email,
-          state: user.state,
-          city: user.city,
-          locality: user.locality,
-          productName: item.productName,
-          price: item.productPrice,
-          quantity: item.productQuantity,
-          category: item.category,
-          image: resolveProductImageUrl(item.images)!,
-          buyerId: user.id,
-          vendorId: item.vendorId,
-          processing: true,
-          delivered: false,
-          context: context,
-        );
+      // Retrieve the payment intent
+      final paymentIntentData = await orderController.getPaymentIntent(
+        context: context,
+        paymentIntentId: paymentIntent['id'],
+      );
+
+      if (paymentIntentData['status'] == 'succeeded') {
+        // Upload each cart item as an order
+        for (var item in cartData.values) {
+          await orderController.uploadOrder(
+            id: '',
+            fullName: user.fullName,
+            email: user.email,
+            state: user.state,
+            city: user.city,
+            locality: user.locality,
+            productName: item.productName,
+            price: item.productPrice,
+            quantity: item.productQuantity,
+            category: item.category,
+            image: resolveProductImageUrl(item.images)!,
+            buyerId: user.id,
+            vendorId: item.vendorId,
+            processing: true,
+            delivered: false,
+            paymentIntentId: paymentIntentData['id'],
+            paymentStatus: paymentIntentData['status'],
+            paymentMethod: 'stripe',
+            context: context,
+          );
+        }
+
+        showSnackBar(context, 'Payment successful');
+      } else {
+        showSnackBar(context, 'Payment failed');
       }
     } catch (e) {
       showSnackBar(context, 'Error: $e');
@@ -503,6 +522,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         vendorId: item.vendorId,
                         processing: true,
                         delivered: false,
+                        paymentIntentId: 'pending',
+                        paymentStatus: 'cod',
+                        paymentMethod: 'cod',
                         context: context,
                       );
                     }).then((value) {

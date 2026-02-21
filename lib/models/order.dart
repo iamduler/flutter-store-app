@@ -16,6 +16,9 @@ class Order {
   final String vendorId;
   final bool processing;
   final bool delivered;
+  final String paymentIntentId;
+  final String paymentStatus;
+  final String paymentMethod;
 
   Order({
     required this.id,
@@ -33,6 +36,9 @@ class Order {
     required this.vendorId,
     required this.processing,
     required this.delivered,
+    required this.paymentIntentId,
+    required this.paymentStatus,
+    required this.paymentMethod,
   });
 
   Map<String, dynamic> toMap() {
@@ -52,6 +58,9 @@ class Order {
       'vendorId': vendorId,
       'processing': processing,
       'delivered': delivered,
+      'paymentIntentId': paymentIntentId,
+      'paymentStatus': paymentStatus,
+      'paymentMethod': paymentMethod,
     };
   }
 
@@ -74,6 +83,9 @@ class Order {
       vendorId: json['vendorId'] as String,
       processing: json['processing'] as bool,
       delivered: json['delivered'] as bool,
+      paymentIntentId: json['paymentIntentId'] as String,
+      paymentStatus: json['paymentStatus'] as String,
+      paymentMethod: json['paymentMethod'] as String,
     );
   }
 }
