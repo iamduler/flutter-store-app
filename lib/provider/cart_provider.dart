@@ -32,10 +32,9 @@ class CartNotifier extends StateNotifier<Map<String, Cart>> {
   Future<void> _loadCartsFromSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     final cartString = prefs.getString('carts');
-    print('cartString: $cartString');
+
     if (cartString != null && cartString.isNotEmpty) {
       state = await compute(_decodeCarts, cartString);
-      print('state: ${state}');
     }
   }
 
@@ -43,7 +42,6 @@ class CartNotifier extends StateNotifier<Map<String, Cart>> {
     final prefs = await SharedPreferences.getInstance();
     final encoded = state.map((key, value) => MapEntry(key, value.toMap()));
     final jsonString = await compute(_encodeCarts, encoded);
-    print('jsonString: $jsonString');
     await prefs.setString('carts', jsonString);
   }
 

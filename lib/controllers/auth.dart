@@ -10,6 +10,7 @@ import 'package:store_app/services/manage_http_response.dart';
 import 'package:store_app/views/screens/authentication/login.dart';
 import 'package:store_app/views/screens/main.dart';
 import 'package:store_app/provider/user_provider.dart';
+import 'package:store_app/provider/delivered_order_provider.dart';
 
 class AuthController {
   Future<void> signUp({
@@ -61,6 +62,7 @@ class AuthController {
     required context,
     required String email,
     required String password,
+    required WidgetRef ref,
   }) async {
     final http.Response response = await http.post(
       Uri.parse('$uri/api/signin'),
@@ -90,8 +92,7 @@ class AuthController {
         final String userJson = response.body;
 
         // Update the application state with the user data using Riverpod
-        final container = ProviderScope.containerOf(context, listen: false);
-        container.read(userProvider.notifier).setUser(userJson);
+        ref.read(userProvider.notifier).setUser(userJson);
 
         // Store the data in shared preferences for future use
         await prefs.setString('user', userJson);
@@ -107,7 +108,7 @@ class AuthController {
     );
   }
 
-  Future<void> signOut({required context}) async {
+  Future<void> signOut({required context, required WidgetRef ref}) async {
     try {
       // Access shared preferences to clear the user token
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -117,8 +118,10 @@ class AuthController {
       await prefs.remove('user');
 
       // Clear the user data from the application state using Riverpod
-      final container = ProviderScope.containerOf(context, listen: false);
-      container.read(userProvider.notifier).signOut();
+      ref.read(userProvider.notifier).signOut();
+
+      // Clear the delivered order count from the application state using Riverpod
+      ref.read(deliveredOrderCountProvider.notifier).resetDeliveredOrderCount();
 
       // Navigate the user to the login screen
       Navigator.pushAndRemoveUntil(
@@ -139,6 +142,7 @@ class AuthController {
     required String state,
     required String city,
     required String locality,
+    required WidgetRef ref,
   }) async {
     try {
       final http.Response response = await http.put(
@@ -157,8 +161,7 @@ class AuthController {
           final userString = jsonEncode(userJson);
 
           // Update the user data in the application state using Riverpod
-          final container = ProviderScope.containerOf(context, listen: false);
-          container.read(userProvider.notifier).setUser(userString);
+          ref.read(userProvider.notifier).setUser(userString);
 
           // Store the user data in shared preferences
           SharedPreferences prefs = await SharedPreferences.getInstance();

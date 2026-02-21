@@ -119,4 +119,15 @@ class OrderController {
       showSnackBar(context, 'Error deleting order: $e');
     }
   }
+
+  // Count delivered orders
+  Future<int> countDeliveredOrders({required String buyerId}) async {
+    try {
+      final orders = await loadOrders(buyerId: buyerId);
+      int count = orders.where((order) => order.delivered == true).length;
+      return count;
+    } catch (e) {
+      throw Exception('Error counting delivered orders: $e');
+    }
+  }
 }

@@ -154,6 +154,7 @@ class _ShippingAddressScreenState extends ConsumerState<ShippingAddressScreen> {
                     state: stateController.text,
                     city: cityController.text,
                     locality: localityController.text,
+                    ref: ref,
                   )
                   .whenComplete(() {
                     if (!context.mounted) return;

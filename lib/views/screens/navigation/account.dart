@@ -6,6 +6,7 @@ import 'package:store_app/provider/favorite_provider.dart';
 import 'package:store_app/provider/user_provider.dart';
 import 'package:store_app/views/screens/detail/screens/order_screen.dart';
 import 'package:store_app/views/screens/detail/screens/shipping_address_screen.dart';
+import 'package:store_app/provider/delivered_order_provider.dart';
 
 class AccountScreen extends ConsumerStatefulWidget {
   const AccountScreen({Key? key}) : super(key: key);
@@ -16,10 +17,21 @@ class AccountScreen extends ConsumerStatefulWidget {
 
 class _AccountScreenState extends ConsumerState<AccountScreen> {
   @override
+  void initState() {
+    super.initState();
+
+    final user = ref.read(userProvider);
+    ref.read(deliveredOrderCountProvider.notifier).fetchDeliveredOrderCount(user!.id, context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final user = ref.read(userProvider);
     final cartData = ref.read(cartProvider);
     final favoriteCount = ref.read(favoriteProvider);
+
+    final deliveredOrderCount = ref.watch(deliveredOrderCountProvider);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -135,7 +147,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                             left: 240,
                             top: 66,
                             child: Text(
-                              "15",
+                              deliveredOrderCount.toString(),
                               style: GoogleFonts.roboto(
                                 color: Colors.white,
                                 fontSize: 22,
