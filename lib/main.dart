@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:store_app/views/screens/authentication/login.dart';
 import 'package:store_app/views/screens/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:store_app/provider/user_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Set the publishable key for the Stripe instance
+  Stripe.publishableKey = 'pk_test_51T3Cq7PIlItWQ5kb01BkcWYqQTcd9PYlOr3iTWG9XM6nX72QdWSJEoSSnTHSncCc15WhAVoNpGbtm5j1a3mMDVMG007PuGM2JA';
+  await Stripe.instance.applySettings();
 
   // Run the flutter application wrapped in a ProviderScope for managing the state of the application
   runApp(ProviderScope(child: const MyApp()));

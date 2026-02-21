@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:store_app/provider/cart_provider.dart';
 import 'package:store_app/services/manage_http_response.dart';
@@ -18,6 +19,92 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   String selectedPaymentMethod = 'stripe';
+  bool isLoading = false;
+  final OrderController orderController = OrderController();
+
+  Future<void> handleStripePayment() async {
+    if (isLoading) return;
+
+    // Fetch cart data from the provider
+    final cartData = ref.read(cartProvider);
+
+    // Fetch user data from the provider
+    final user = ref.watch(userProvider);
+
+    // Check if cart data is empty
+    if (cartData.isEmpty) {
+      showSnackBar(context, 'Your cart is empty');
+      return;
+    }
+
+    // Check if user data is empty
+    if (user == null) {
+      showSnackBar(context, 'Please login to continue');
+      return;
+    }
+
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      // Calculate the total amount of the cart
+      final totalAmount = cartData.values.fold(
+        0.0,
+        (sum, item) => sum + (item.productPrice * item.productQuantity),
+      );
+
+      if (totalAmount <= 0 || totalAmount.isNaN) {
+        showSnackBar(context, 'The total amount of your cart is 0');
+        return;
+      }
+
+      // Create a payment intent
+      final paymentIntent = await orderController.createPaymentIntent(
+        amount: (totalAmount * 100).toInt(),
+        currency: 'usd',
+      );
+
+      // Initialize the payment sheet
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: paymentIntent['client_secret'],
+          merchantDisplayName: 'Duler Store',
+        ),
+      );
+
+      // Present the payment sheet
+      await Stripe.instance.presentPaymentSheet();
+
+      // Upload each cart item as an order
+      for (var item in cartData.values) {
+        await orderController.uploadOrder(
+          id: '',
+          fullName: user.fullName,
+          email: user.email,
+          state: user.state,
+          city: user.city,
+          locality: user.locality,
+          productName: item.productName,
+          price: item.productPrice,
+          quantity: item.productQuantity,
+          category: item.category,
+          image: resolveProductImageUrl(item.images)!,
+          buyerId: user.id,
+          vendorId: item.vendorId,
+          processing: true,
+          delivered: false,
+          context: context,
+        );
+      }
+    } catch (e) {
+      showSnackBar(context, 'Error: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -393,7 +480,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       );
                     });
                   } else if (selectedPaymentMethod == 'stripe') {
-                    // Implement Stripe payment
+                    await handleStripePayment();
                   } else {
                     showSnackBar(context, 'Please select a payment method');
                   }
@@ -406,16 +493,18 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Center(
-                    child: Text(
-                      selectedPaymentMethod == 'cash_on_delivery'
-                          ? 'Pay with COD'
-                          : 'Pay Now',
-                      style: GoogleFonts.roboto(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text(
+                            selectedPaymentMethod == 'cash_on_delivery'
+                                ? 'Pay with COD'
+                                : 'Pay Now',
+                            style: GoogleFonts.roboto(
+                              fontSize: 16,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ),

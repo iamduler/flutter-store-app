@@ -132,4 +132,32 @@ class OrderController {
       throw Exception('Error counting delivered orders: $e');
     }
   }
+
+  // Create a payment intent
+  Future<Map<String, dynamic>> createPaymentIntent({
+    required int amount,
+    required String currency,
+  }) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
+
+      final response = await http.post(
+        Uri.parse('$uri/api/orders/payment/test'),
+        body: jsonEncode({'amount': amount.toString(), 'currency': currency}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token!,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to create payment intent: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error creating payment intent: $e');
+    }
+  }
 }
