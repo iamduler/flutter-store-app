@@ -65,48 +65,57 @@ class AuthController {
     required String password,
     required WidgetRef ref,
   }) async {
-    final http.Response response = await http.post(
-      Uri.parse('$uri/api/signin'),
-      body: json.encode({'email': email, 'password': password}),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-    );
+    try {
+      final http.Response response = await http.post(
+        Uri.parse('$uri/api/signin'),
+        body: json.encode({'email': email, 'password': password}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      );
 
-    manageHttpResponse(
-      response: response,
-      context: context,
-      onSuccess: () async {
-        // Access shared preferences to store the user token
-        SharedPreferences prefs = await SharedPreferences.getInstance();
+      manageHttpResponse(
+        response: response,
+        context: context,
+        onSuccess: () async {
+          // Access shared preferences to store the user token
+          SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        // Get the token from the response body
-        final Map<String, dynamic> decodedBody =
-            jsonDecode(response.body) as Map<String, dynamic>;
-        final String token = decodedBody['token'] as String;
+          // Get the token from the response body
+          final Map<String, dynamic> decodedBody =
+              jsonDecode(response.body) as Map<String, dynamic>;
+          final String token = decodedBody['token'] as String;
 
-        // Store the authentication token securely in shared preferences
-        await prefs.setString('auth_token', token);
+          // Store the authentication token securely in shared preferences
+          await prefs.setString('auth_token', token);
 
-        // Use the entire response body as the user JSON,
-        // because the API returns the user fields at the top level
-        final String userJson = response.body;
+          // Use the entire response body as the user JSON,
+          // because the API returns the user fields at the top level
+          final String userJson = response.body;
 
-        // Update the application state with the user data using Riverpod
-        ref.read(userProvider.notifier).setUser(userJson);
+          // Update the application state with the user data using Riverpod
+          ref.read(userProvider.notifier).setUser(userJson);
 
-        // Store the data in shared preferences for future use
-        await prefs.setString('user', userJson);
+          // Store the data in shared preferences for future use
+          await prefs.setString('user', userJson);
 
-        // Navigate to main screen and remove all previous screens from the stack
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-          (route) => false, // Navigate to main screen
-        );
-        showSnackBar(context, 'Login successful');
-      },
-    );
+          // Navigate to main screen and remove all previous screens from the stack
+          if (ref.read(userProvider)!.token.isNotEmpty) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const MainScreen()),
+              (route) => false, // Navigate to main screen
+            );
+            showSnackBar(context, 'Login successful');
+          }
+          else {
+            showSnackBar(context, 'Invalid token');
+          }
+        },
+      );
+    } catch (e) {
+      showSnackBar(context, 'Error signing in: $e');
+    }
   }
 
   Future<void> signOut({required context, required WidgetRef ref}) async {
@@ -203,6 +212,93 @@ class AuthController {
       );
     } catch (e) {
       showSnackBar(context, 'Error verifying OTP: $e');
+    }
+  }
+
+  Future<void> deleteUser({
+    required context,
+    required String id,
+    required WidgetRef ref, // Access the riverpod state
+  }) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
+
+      if (token == null) {
+        showSnackBar(context, 'Please login to continue');
+        return;
+      }
+
+      final http.Response response = await http.delete(
+        Uri.parse('$uri/api/users/$id'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=utf-8',
+          'x-auth-token': token,
+        },
+      );
+
+      manageHttpResponse(
+        response: response,
+        context: context,
+        onSuccess: () async {
+          // Clear the user data from the application state using Riverpod
+          ref.read(userProvider.notifier).signOut();
+
+          // Clear the user data from shared preferences
+          await prefs.remove('user');
+          await prefs.remove('auth_token');
+
+          // Navigate to login screen and remove all previous screens from the stack
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+            (route) => false,
+          );
+          showSnackBar(context, 'User deleted successfully');
+        },
+      );
+    } catch (e) {
+      showSnackBar(context, 'Error deleting user: $e');
+    }
+  }
+
+  getUser({required context, required WidgetRef ref}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
+
+      if (token == null) {
+        showSnackBar(context, 'Please login to continue');
+        return;
+      }
+
+      final http.Response tokenResponse = await http.get(
+        Uri.parse('$uri/api/check-token'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=utf-8',
+          'x-auth-token': token,
+        },
+      );
+
+      var isValidToken = jsonDecode(tokenResponse.body);
+
+      if (isValidToken == true) {
+        // Fetch the user data
+        final http.Response userResponse = await http.get(
+          Uri.parse('$uri/api/users/me'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=utf-8',
+            'x-auth-token': token,
+          },
+        );
+
+        ref.read(userProvider.notifier).setUser(userResponse.body);
+      }
+      else {
+        showSnackBar(context, 'Invalid token');
+      }
+    } catch (e) {
+      showSnackBar(context, 'Error getting user: $e');
     }
   }
 }

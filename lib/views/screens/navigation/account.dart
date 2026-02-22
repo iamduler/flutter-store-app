@@ -69,6 +69,58 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     );
   }
 
+  void showDeleteAccountDialog(BuildContext context) {
+    final user = ref.read(userProvider);
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'Delete Account',
+            style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Are you sure you want to delete your account?',
+            style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await _authController.deleteUser(context: context, id: user!.id, ref: ref);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Delete Account',
+                style: GoogleFonts.roboto(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -381,7 +433,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                   ),
                 );
               },
-              leading: Image.asset('assets/icons/orders.png'),
+              leading: Icon(Icons.track_changes, color: Colors.green),
               title: Text(
                 'Track your order',
                 style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
@@ -399,18 +451,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                   ),
                 );
               },
-              leading: Image.asset('assets/icons/history.png'),
+              leading: Icon(Icons.history, color: Colors.blue),
               title: Text(
                 'History',
-                style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 10),
-            ListTile(
-              onTap: () {},
-              leading: Image.asset('assets/icons/help.png'),
-              title: Text(
-                'Help',
                 style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
               ),
             ),
@@ -419,9 +462,20 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               onTap: () {
                 showLogoutDialog(context);
               },
-              leading: Image.asset('assets/icons/logout.png'),
+              leading: Icon(Icons.logout, color: Colors.red),
               title: Text(
                 'Logout',
+                style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ListTile(
+              onTap: () {
+                showDeleteAccountDialog(context);
+              },
+              leading: Icon(Icons.delete, color: Colors.red),
+              title: Text(
+                'Delete Account',
                 style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
               ),
             ),

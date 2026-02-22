@@ -44,7 +44,7 @@ class User {
   // Convert Map<String, dynamic> to User object
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      id: map['_id'] as String,
+      id: map['_id'] as String? ?? "",
       fullName: map['fullName'] as String? ?? "",
       email: map['email'] as String? ?? "",
       state: map['state'] as String? ?? "",

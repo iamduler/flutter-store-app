@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:store_app/controllers/auth.dart';
 import 'package:store_app/views/screens/authentication/login.dart';
 import 'package:store_app/views/screens/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:store_app/provider/user_provider.dart';
 
 void main() async {
@@ -21,22 +20,9 @@ class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   // Method to check the token and set the user data if available
-  Future<void> _checkTokenAndSetUser(WidgetRef ref) async {
-    // Obtain an instance of the shared preferences for local data storage
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Get the token from the shared preferences
-    String? token = prefs.getString('auth_token');
-    String? userJson = prefs.getString('user');
-
-    // If both the token and user data are not empty, set the user data
-    if (token != null && userJson != null) {
-      ref.read(userProvider.notifier).setUser(userJson);
-    }
-    else {
-      // If either the token or user data is empty, sign out the user
-      ref.read(userProvider.notifier).signOut();
-    }
+  Future<void> _checkTokenAndSetUser(WidgetRef ref, context) async {
+    await AuthController().getUser(context: context, ref: ref);
+    ref.watch(userProvider);
   }
   
   @override
@@ -50,13 +36,13 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: FutureBuilder(future: _checkTokenAndSetUser(ref), builder: (context, snapshot) {
+      home: FutureBuilder(future: _checkTokenAndSetUser(ref, context), builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
         final user = ref.watch(userProvider);
-        return user != null ? MainScreen() : LoginScreen();
+        return user!.token.isNotEmpty ? MainScreen() : LoginScreen();
       }),
     );
   }
