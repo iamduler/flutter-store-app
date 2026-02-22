@@ -8,6 +8,7 @@ import 'package:store_app/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:store_app/services/manage_http_response.dart';
 import 'package:store_app/views/screens/authentication/login.dart';
+import 'package:store_app/views/screens/authentication/otp.dart';
 import 'package:store_app/views/screens/main.dart';
 import 'package:store_app/provider/user_provider.dart';
 import 'package:store_app/provider/delivered_order_provider.dart';
@@ -47,7 +48,7 @@ class AuthController {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => LoginScreen(),
+              builder: (context) => OTPScreen(email: email),
             ), // Navigate to login screen
           );
           showSnackBar(context, 'Account created successfully');
@@ -170,6 +171,38 @@ class AuthController {
       );
     } catch (e) {
       print('Error saving address: $e');
+    }
+  }
+
+  Future<void> verifyOTP({
+    required context,
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final http.Response response = await http.post(
+        Uri.parse('$uri/api/verify-otp'),
+        body: json.encode({'email': email, 'otp': otp}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      );
+
+      manageHttpResponse(
+        response: response,
+        context: context,
+        onSuccess: () {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+            (route) => false,
+          );
+
+          showSnackBar(context, 'Account verified. Please login to continue');
+        },
+      );
+    } catch (e) {
+      showSnackBar(context, 'Error verifying OTP: $e');
     }
   }
 }
